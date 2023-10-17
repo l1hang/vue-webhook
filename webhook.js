@@ -13,15 +13,14 @@ let server = http.createServer(function (req, res) {
         req.on('data',function(buffer){
             buffers.push(buffer)
         })
-        req.on('end',function(buffer){
+        req.on('end',function(){
         let body = Buffer.concat(buffers)
-        let event = req.headers['x-gitlab-event'] //event = Push Hook
+        let event = req.headers['x-gitlab-event'] 
         //github 请求来的时候，要传递请求体body，另外还会传一个signature过来，你需要验证签名对不对
         let signature = req.headers['x-hub-signature']
         if(signature !== sign(body)){
             res.end('Not Allowed')
         }
-        })
         res.setHeader('Content-Type','application/json')
         res.end(JSON.stringify({ok:true}))
         if(event == 'push') {  //开始部署
@@ -45,6 +44,7 @@ let server = http.createServer(function (req, res) {
                 `)
             })
         }
+    })
     }else {
         res.end('Not Found')
     }
